@@ -1,0 +1,299 @@
+" mrtheduts' vimrc
+" inspired by Doug Black's https://dougblack.io/words/a-good-vimrc.html
+
+" Plugins {{{
+if has('nvim')
+
+    call plug#begin('~/.local/share/nvim/plugged')
+
+    " Grepper - Use Ag (grep inside multiple files) inside nvim
+    Plug 'mhinz/vim-grepper'
+
+    " CtrlP - Fuzzy File Search
+    Plug 'ctrlpvim/ctrlp.vim'
+
+    " Gundo - View vim undo tree
+    Plug 'sjl/gundo.vim'
+
+    " LSP - Language Server Protocol support
+    Plug 'autozimu/LanguageClient-neovim', {
+    \ 'branch': 'next',
+    \ 'do': 'bash install.sh',
+    \ }
+
+    " Aerojump - Easier (fuzzy) navigation in file
+    Plug 'philip-karlsson/aerojump.nvim', { 
+    \ 'do': ':UpdateRemotePlugins' 
+    \ }
+
+    " Airline - Status line for vim
+    Plug 'vim-airline/vim-airline'
+    "Plug 'vim-airline/vim-airline-themes'
+
+    " One Half - colour scheme
+    Plug 'sonph/onehalf', {
+    \ 'rtp': 'vim/'
+    \ }
+
+    " Semantic highlight for Python
+    Plug 'numirias/semshi', {
+    \ 'do': ':UpdateRemotePlugins'
+    \ }
+
+    " Deoplete - Completion framework
+    Plug 'Shougo/deoplete.nvim', {
+    \ 'do': ':UpdateRemotePlugins'
+    \ }
+
+    call plug#end()
+
+endif
+" }}}
+
+" Colour {{{
+if has('nvim')
+    colorscheme onehalfdark
+	let g:airline_theme='onehalfdark'
+endif
+" }}}
+
+" Misc {{{
+
+" Leader is comma
+let mapleader=","
+
+" Enable syntax processing
+syntax enable
+
+" Enable line for file-specifc configuration
+set modelines=1
+
+" WARNING
+" jk is esc
+inoremap jk <esc>
+
+" Save session
+nnoremap <leader>s :mksession<CR>
+
+" }}}
+
+" Splits {{{
+
+" Jump between splits more easily
+" Up
+nnoremap <C-k> <C-w>k
+" Down
+nnoremap <C-j> <C-w>j
+" Right
+nnoremap <C-l> <C-w>l
+" Left
+nnoremap <C-h> <C-w>h
+
+" Increase split window height
+nnoremap <Leader>k <C-w>+
+" Decrease split window height
+nnoremap <Leader>j <C-w>-
+" Increase split window width
+nnoremap <Leader>l <C-w>>
+" Decrease split window width
+nnoremap <Leader>h <C-w><
+
+" }}}
+
+" Language Server Protocol {{{
+
+if has('nvim')
+
+    set hidden
+    let g:LanguageClient_serverCommands = {
+    \ 'sh': ['bash-language-server', 'start'],
+    \ 'lua': ['java', '-cp', '/home/mrtheduts/Git/programs/EmmyLua-LanguageServer/EmmyLua-LS/build/libs/Emmy-Lua-LS-all.jar', 'com.tang.vscode.MainKt'],
+    \ 'python': ['pyls'],
+    \ 'c': ['ccls', '--log-file=/tmp/cc.log'],
+    \ 'cpp': ['ccls', '--log-file=/tmp/cc.log']
+    \ }
+
+    let g:LanguageClient_autoStart = 1
+    set signcolumn=yes
+
+    nnoremap <F5> :call LanguageClient_contextMenu()<CR>
+    nnoremap <silent> K :call LanguageClient#textDocument_hover()<CR>
+    nnoremap <silent> gd :call LanguageClient#textDocument_definition()<CR>
+
+endif
+
+" }}}
+
+" Spaces & Tabs {{{
+
+" Number of visual spaces per TAB
+set tabstop=4
+
+" Number of spaces in tab when editing
+set softtabstop=4
+
+" Tabs are spaces
+set expandtab
+
+" Set shift width to 4 spaces
+set shiftwidth=4
+
+" Set autoindent on
+set autoindent
+
+" }}}
+
+" UI Layout {{{
+
+" Show line numbers
+set number
+
+" Show command in bottom bar
+set showcmd
+
+" Highlidht current line
+set cursorline
+
+" Load filetype-specific ident files
+filetype indent on
+
+" Visual autocomplete for command menu
+set wildmenu
+
+" Redraw only when we need to
+set lazyredraw
+
+" Highlight matching [{()}]
+set showmatch
+
+" Default mode indicator FINALLY OFF
+set noshowmode
+
+" }}}
+
+" Searching {{{
+
+" Search as characters are entered
+set incsearch
+
+" Highlight matches
+set hlsearch
+
+" Turn off search highlight
+nnoremap <leader><space> :nohlsearch<CR>
+
+" }}}
+
+" Folding {{{
+
+" Enable folding
+set foldenable
+
+" Open most folds by default
+set foldlevelstart=10
+
+" 10 nested fold max
+set foldnestmax=10
+
+" Space open/closes folds
+nnoremap <space> za
+
+" Fold based on indent level
+set foldmethod=indent
+
+" }}}
+
+" Line Shortcuts {{{
+
+" Move vertically by visual line
+nnoremap j gj
+nnoremap k gk
+
+" Move to beginning/end of line
+nnoremap B ^
+nnoremap E $
+
+" $/^ doesn't do anything
+nnoremap $ <nop>
+nnoremap ^ <nop>
+
+" }}}
+
+" Buffer {{{
+
+nnoremap <TAB> :bnext<CR>
+nnoremap <S-TAB> :bprev<CR>
+
+" }}}
+
+" Aerojump {{{
+"
+if has('nvim')
+    nmap <leader>fs <plug>(AerojumpSpace)
+    nmap <leader>fb <plug>(AerojumpBolt)
+endif
+
+" }}}
+
+" Airline {{{
+
+if has('nvim')
+    " Enable top tabline
+    let g:airline#extensions#tabline#enabled = 1
+
+    " Enable powerline fonts
+    let g:airline_powerline_fonts = 1
+endif
+
+" }}}
+
+" Gundo {{{
+if has('nvim')
+    nnoremap <leader>u :GundoToggle<CR>
+endif
+" }}}
+
+" Grepper {{{
+
+" Mapping to Grepper
+if has('nvim')
+    nnoremap <leader>g :Grepper -tool git<cr>
+    nnoremap <leader>G :Grepper -tool ag<cr>
+
+    nmap gs <plug>(GrepperOperator)
+    xmap gs <plug>(GrepperOperator)
+
+endif
+" }}}
+
+" CtrlP settings {{{
+if has('nvim')
+    let g:ctrlp_match_window = 'bottom,order:ttb'
+    let g:ctrlp_switch_buffer = 0
+    let g:ctrlp_working_path_mode = 0
+
+    " Tweak CtrlP speed with Ag
+    " let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+    let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
+endif
+" }}}
+
+" Deoplete settings {{{
+if has('nvim')
+    let g:deoplete#enable_at_startup = 1
+    let g:deoplete#auto_complete_delay = 100
+endif
+" }}}
+
+" Backup configuration {{{
+
+set backup
+set backupdir=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
+set backupskip=/tmp/*,/private/tmp/*
+set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
+set writebackup
+
+" }}}
+
+" Open this file with folded Sections
+" vim:foldmethod=marker:foldlevel=0
