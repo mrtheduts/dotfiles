@@ -1,3 +1,6 @@
 # Dotfiles
 
-Hello!
+Here are my dotfiles.
+
+Enjoy!
+
