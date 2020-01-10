@@ -49,6 +49,13 @@
         bindsym XF86AudioMute exec amixer -q -D pulse sset Master toggle
     # }}}
 
+    # Media Player controls {{{
+        bindsym XF86AudioPlay exec playerctl play
+        bindsym XF86AudioPause exec playerctl pause
+        bindsym XF86AudioNext exec playerctl next
+        bindsym XF86AudioPrev exec playerctl previous
+    # }}}
+
     # Brightness controls {{{
         # Raise brightness in 5%
         bindsym XF86MonBrightnessUp exec light -A 5
@@ -374,8 +381,7 @@
         # Use i3bar as frame
         i3bar_command i3bar
         # Command to output information to ther bar
-        status_command /bin/bumblebee-status -m nic brightness memory battery time pulseaudio -p time.format="%H:%M" -t solarized 
-
+        status_command bumblebee-status -m caffeine nic memory brightness amixer battery date time -p interval=2.5 time.format="%H:%M" date.format="%a, %b %d %Y" -t greyish-powerline
         # Show it on primary monitor
         tray_output primary
         # Place it on top of the screen
@@ -396,11 +402,12 @@
         }
 
         # Font
-        font pango:Hack Nerd Font Mono 10
+        font pango:NotoSans Nerd Font 8
         # Show only workspace name after ":", if used
         strip_workspace_numbers yes
         # Space used near screen edges
         tray_padding 1
+
     }
 
 # }}}
