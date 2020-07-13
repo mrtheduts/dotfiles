@@ -6,54 +6,72 @@ if has('nvim')
 
     call plug#begin('~/.local/share/nvim/plugged')
 
-    " Grepper - Use Ag (grep inside multiple files) inside nvim
-    Plug 'mhinz/vim-grepper'
-
-    " CtrlP - Fuzzy File Search
-    Plug 'ctrlpvim/ctrlp.vim'
-
-    " Gundo - View vim undo tree
-    Plug 'sjl/gundo.vim'
-
-    " Conquer Of Completion
-    Plug 'neoclide/coc.nvim', {
-    \ 'branch': 'release'
-    \ }
-
     " Aerojump - Easier (fuzzy) navigation in file
     Plug 'philip-karlsson/aerojump.nvim', { 
     \ 'do': ':UpdateRemotePlugins' 
     \ }
 
-    " Airline - Status line for vim
-    Plug 'vim-airline/vim-airline'
-    "Plug 'vim-airline/vim-airline-themes'
+    " Conquer Of Completion - Language Server Protocol
+    Plug 'neoclide/coc.nvim', {
+    \ 'branch': 'release'
+    \ }
+    
+    " Colorizer - Color Preview
+    Plug 'chrisbra/Colorizer'
+
+    " CtrlP - Fuzzy File Search
+    Plug 'ctrlpvim/ctrlp.vim'
+
+    " Doorboy - Autoclose brackets
+    Plug 'itmammoth/doorboy.vim'
+
+    " Gundo - View vim undo tree
+    Plug 'sjl/gundo.vim'
+
+    Plug 'bilalq/lite-dfm'
+
+    " Markdown-Preview
+    Plug 'iamcco/markdown-preview.nvim', { 
+    \ 'do': 'cd app & yarn install'
+    \ }
+
+    " NerdCommenter - Commenting Plugin
+    Plug 'scrooloose/nerdcommenter'
+
+    " Nerdtree file navigator
+    Plug 'scrooloose/nerdtree'
+
+    " Nerdtree git integration
+    Plug 'Xuyuanp/nerdtree-git-plugin'
 
     " One Half - colour scheme
     Plug 'sonph/onehalf', {
     \ 'rtp': 'vim/'
     \ }
 
+    " vim-Airline - Status line for vim
+    Plug 'vim-airline/vim-airline'
+    "Plug 'vim-airline/vim-airline-themes'
+
+    " vim-Autotag - Update ctags
+    Plug 'craigemery/vim-autotag'
+
+    " vim-Fugitive - Git wrapper
+    Plug 'tpope/vim-fugitive'
+
+    " vim-Grepper - Use Ag (grep inside multiple files) inside nvim
+    Plug 'mhinz/vim-grepper'
+
+    " vim-LSP-CXX-Highlight
+    Plug 'jackguo380/vim-lsp-cxx-highlight'
+
+    " vim-Pencil - Different word wrappers
+    Plug 'reedes/vim-pencil'
+
+    " vim-Polyglot
     " A Collection of language packs for Vim
     " One to rule them all
     Plug 'sheerun/vim-polyglot'
-
-    " Markdown live preview
-    Plug 'iamcco/markdown-preview.nvim', { 
-    \ 'do': 'cd app & yarn install'
-    \ }
-
-    " C++ highlight with a lsp
-    Plug 'jackguo380/vim-lsp-cxx-highlight'
-
-    " Git wrapper
-    Plug 'tpope/vim-fugitive'
-
-    " Commenting Plugin
-    Plug 'scrooloose/nerdcommenter'
-
-    " Nerdtree file navigator
-    Plug 'scrooloose/nerdtree'
 
     call plug#end()
 
@@ -62,15 +80,32 @@ endif
 
 " Colour {{{
 if has('nvim')
+
     colorscheme onehalfdark
 	let g:airline_theme='onehalfdark'
+
+    " Change floating window color to make informations readable
+    hi link Cocfloating onehalfdark
 endif
 " }}}
 
-" Misc {{{
+" Folding {{{
 
-    " Leader is comma
-    let mapleader=","
+    " Enable folding
+    set foldenable
+
+    " Open most folds by default
+    set foldlevelstart=10
+
+    " 10 nested fold max
+    set foldnestmax=10
+
+    " Fold based on indent level
+    set foldmethod=indent
+
+" }}}
+
+" Misc {{{
 
     " Enable syntax processing
     syntax enable
@@ -78,30 +113,53 @@ endif
     " Enable line for file-specifc configuration
     set modelines=1
 
-    " WARNING
-    " jk is esc
-    inoremap jk <esc>
-
-    " Save session
-    nnoremap <leader>s :mksession<CR>
-
-    " Add coc status on statusline
-    set statusline^=%{coc#status()}
-
     " Scrolloff
     set scrolloff=20
 
-    " Necessary for NerdComenter
-    filetype plugin on
+if has('nvim')
+    
+    " Add coc status on statusline
+    set statusline^=%{coc#status()}
+
+endif
+
+" }}}
+
+" Remaping {{{
+
+" Misc {{{
+
+    " WARNING
+    " jk is esc
+    inoremap jk <esc>
 
     " Clipboard mapping
     " Copy and paste to/from system clipboard
     noremap <Leader>y "+y
     noremap <Leader>p "+p
 
+    " Turn off search highlight
+    nnoremap <leader><space> :nohlsearch<CR>
+
 " }}}
 
-" Splits {{{
+" Movement {{{
+
+    " Move vertically by visual line
+    nnoremap j gj
+    nnoremap k gk
+
+    " Move to beginning/end of line
+    nnoremap B ^
+    nnoremap E $
+
+    " $/^ doesn't do anything
+    nnoremap $ <nop>
+    nnoremap ^ <nop>
+
+    " Switch between buffers easily with tab and shift+tab
+    nnoremap <TAB> :bnext<CR>
+    nnoremap <S-TAB> :bprev<CR>
 
     " Jump between splits more easily
     " Up
@@ -112,6 +170,10 @@ endif
     nnoremap <C-l> <C-w>l
     " Left
     nnoremap <C-h> <C-w>h
+
+" }}}
+
+" Splits {{{
 
     " Increase split window height
     nnoremap <Leader>k <C-w>+
@@ -124,8 +186,91 @@ endif
 
 " }}}
 
-" Language Server Protocol {{{
+" }}}
 
+" Spaces & Tabs {{{
+
+    " Number of visual spaces per TAB
+    set tabstop=4
+
+    " Number of spaces in tab when editing
+    set softtabstop=4
+
+    " Tabs are spaces
+    set expandtab
+
+    " Set shift width to 4 spaces
+    set shiftwidth=4
+
+    " Set autoindent on
+    set autoindent
+
+    " Set tab space the same as the line above
+    set smarttab
+
+    " Set tab for 2 in python files
+    autocmd FileType python setlocal shiftwidth=2 tabstop=2 softtabstop=2
+
+" }}}
+
+" Searching {{{
+
+    " Search as characters are entered
+    set incsearch
+
+    " Highlight matches
+    set hlsearch
+
+" }}}
+
+" UI Layout {{{
+
+    " Show line numbers as relative
+    :set number relativenumber
+
+    " Show relative lines only on current file
+    :augroup numbertoggle
+    :  autocmd!
+    :  autocmd BufEnter,FocusGained,InsertLeave * set relativenumber
+    :  autocmd BufLeave,FocusLost,InsertEnter   * set norelativenumber
+    :augroup END
+
+    " Show command in bottom bar
+    set showcmd
+
+    " Highlidht current line
+    set cursorline
+
+    " Load filetype-specific ident files
+    filetype indent on
+
+    " Visual autocomplete for command menu
+    set wildmenu
+
+    " Redraw only when we need to
+    set lazyredraw
+
+    " Highlight matching [{()}]
+    set showmatch
+
+    " Default mode indicator FINALLY OFF
+    set noshowmode
+
+" }}}
+
+" Plugins Config {{{
+
+" Aerojump {{{
+if has('nvim')
+
+    nmap <space> <plug>(AerojumpDefault)
+    nmap <leader><space> <plug>(AerojumpBolt)
+
+endif
+
+" }}}
+
+" Conquer of Completion {{{
 if has('nvim')
 
     " Without it, TextEdit might fail
@@ -162,9 +307,6 @@ if has('nvim')
       return !col || getline('.')[col - 1]  =~# '\s'
     endfunction
 
-    " Use <c-space> to trigger completion.
-    inoremap <silent><expr> <c-space> coc#refresh()
-
     " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
     " Coc only does snippet and additional edit on confirm.
     inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
@@ -188,127 +330,97 @@ if has('nvim')
     nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
     " Show commands
     nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
+
+    " TeXLab build shortcut
+    nnoremap <silent> <leader>lb :<C-u>CocCommand latex.Build<cr>
+
+    " clangd swap between header and file
+    nnoremap <silent> <leader>H :<C-u>CocCommand clangd.switchSourceHeader<cr>
+    " CocActions
+    nmap <silent> <leader>a :<C-u>CocCommand actions.open<CR>
 endif
 
 " }}}
 
-" Spaces & Tabs {{{
-
-    " Number of visual spaces per TAB
-    set tabstop=4
-
-    " Number of spaces in tab when editing
-    set softtabstop=4
-
-    " Tabs are spaces
-    set expandtab
-
-    " Set shift width to 4 spaces
-    set shiftwidth=4
-
-    " Set autoindent on
-    set autoindent
-
-    set smarttab
-
-" }}}
-
-" UI Layout {{{
-
-    " Show line numbers
-    set number
-
-    " Show command in bottom bar
-    set showcmd
-
-    " Highlidht current line
-    set cursorline
-
-    " Load filetype-specific ident files
-    filetype indent on
-
-    " Visual autocomplete for command menu
-    set wildmenu
-
-    " Redraw only when we need to
-    set lazyredraw
-
-    " Highlight matching [{()}]
-    set showmatch
-
-    " Default mode indicator FINALLY OFF
-    set noshowmode
-
-" }}}
-
-" Searching {{{
-
-    " Search as characters are entered
-    set incsearch
-
-    " Highlight matches
-    set hlsearch
-
-    " Turn off search highlight
-    nnoremap <leader><space> :nohlsearch<CR>
-
-" }}}
-
-" Folding {{{
-
-    " Enable folding
-    set foldenable
-
-    " Open most folds by default
-    set foldlevelstart=10
-
-    " 10 nested fold max
-    set foldnestmax=10
-
-    " Space open/closes folds
-    nnoremap <space> za
-
-    " Fold based on indent level
-    set foldmethod=indent
-
-" }}}
-
-" Line Shortcuts {{{
-
-    " Move vertically by visual line
-    nnoremap j gj
-    nnoremap k gk
-
-    " Move to beginning/end of line
-    nnoremap B ^
-    nnoremap E $
-
-    " $/^ doesn't do anything
-    nnoremap $ <nop>
-    nnoremap ^ <nop>
-
-" }}}
-
-" Buffer {{{
-
-    " Switch between buffers easily with tab and shift+tab
-    nnoremap <TAB> :bnext<CR>
-    nnoremap <S-TAB> :bprev<CR>
-
-" }}}
-
-" Aerojump {{{
-
+" Colorizer {{{
 if has('nvim')
-    nmap <leader>fs <plug>(AerojumpSpace)
-    nmap <leader>fb <plug>(AerojumpBolt)
+    " Colorize automatically some filetypes
+    let g:colorizer_auto_filetype='css,html,typescriptreact'
+endif
+" }}}
+
+" CtrlP settings {{{
+if has('nvim')
+
+    let g:ctrlp_match_window = 'bottom,order:ttb'
+    let g:ctrlp_switch_buffer = 0
+    let g:ctrlp_working_path_mode = 0
+
+    " Tweak CtrlP speed with Ag
+    let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
+
 endif
 
 " }}}
 
-" Airline {{{
-
+" Doorboy {{{
 if has('nvim')
+
+    "Add $ as a bracket in LaTeX files
+    let g:doorboy_additional_quotations = {
+        \ 'tex': ['$']
+    \ }
+
+endif
+" }}}
+
+" Gundo {{{
+if has('nvim')
+
+    let g:gundo_right = 1
+    let g:gundo_preview_bottom = 1
+    nnoremap <leader>u :GundoToggle<CR>
+
+endif
+
+" }}}
+
+" NerdCommenter {{{
+if has('nvim')
+
+    " Necessary 
+    filetype plugin on
+
+    " Add spaces after comment delimiters by default
+    let g:NERDSpaceDelims = 1
+
+    " Enable trimming of trailing whitespace when uncommenting
+    let g:NERDTrimTrailingWhitespace = 1
+
+endif
+" }}}
+
+" Nerdtree settings {{{
+if has('nvim')
+
+    map <C-n> :NERDTreeToggle<CR>
+
+    " Open nerdtree if nvim opened a directory
+    autocmd StdinReadPre * let s:std_in=1
+    autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | exe 'cd '.argv()[0] | endif
+
+    " Close nerdtree when file is opened
+    let NERDTreeQuitOnOpen = 1
+    " Automatically delete the buffer of the file you just deleted in nerdtree
+    let NERDTreeAutoDeleteBuffer = 1
+
+endif
+
+" }}}
+
+" vim-Airline {{{
+if has('nvim')
+
     " Enable top tabline
     let g:airline#extensions#tabline#enabled = 1
 
@@ -317,61 +429,33 @@ if has('nvim')
 
     " Enable coc integration
     let g:airline#extensions#coc#enabled = 1
-endif
-
-" }}}
-
-" Gundo {{{
-
-if has('nvim')
-    nnoremap <leader>u :GundoToggle<CR>
-endif
-
-" }}}
-
-" Grepper {{{
-
-" Mapping to Grepper
-if has('nvim')
-    nnoremap <leader>g :Grepper -tool git<cr>
-    nnoremap <leader>G :Grepper -tool ag<cr>
-
-    nmap gs <plug>(GrepperOperator)
-    xmap gs <plug>(GrepperOperator)
 
 endif
 
 " }}}
 
-" CtrlP settings {{{
-
+" vim-AutoCtags {{{
 if has('nvim')
-    let g:ctrlp_match_window = 'bottom,order:ttb'
-    let g:ctrlp_switch_buffer = 0
-    let g:ctrlp_working_path_mode = 0
 
-    " Tweak CtrlP speed with Ag
-    let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
-endif
-
-" }}}
-
-" Nerdtree settings {{{
-
-if has('nvim')
-    map <C-n> :NERDTreeToggle<CR>
-    autocmd StdinReadPre * let s:std_in=1
-    autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | exe 'cd '.argv()[0] | endif
-endif
-
-" }}}
-
-" Ctags {{{
-
-if has('nvim')
     " Generate them with ctags and add them here
-    set tags+=$HOME/Git/unicamp/EmuParadise
+    "set tags+=$HOME/Git/unicamp/EmuParadise
+    "
 endif
+
+" }}}
+
+" vim-Grepper {{{
+
+if has('nvim')
+
+    " Mapping to Grepper on opened buffers
+    nnoremap <leader>g :Grepper -buffers<cr>
+    " Map to Grepper with Ag
+    nnoremap <leader>G :GrepperAg<cr>
+
+endif
+
+" }}}
 
 " }}}
 

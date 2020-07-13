@@ -11,6 +11,8 @@
     set $set_wallpaper DISPLAY=:0 sh ~/.fehbg
     # Command to execute script of mine that handles tablet mode
     set $tablet_mode ~/Scripts/easy-tablet.sh -s "~/Scripts/tablet-mode-on.sh","~/Scripts/tablet-mode-off.sh"
+    # Command to execute script changing USB_Sound_Card module
+    set $reload_module ~/Scripts/unload-and-load-right-module-USB_Sound.sh
     # Default terminal
     set $term terminator
 
@@ -19,15 +21,26 @@
 # Exec on startup {{{
 
     # Window compositor
-    exec --no-startup-id compton -b --config ~/.config/compton/compton.conf
+    exec --no-startup-id picom -b --config ~/.config/picom/picom.conf
     # Custom gesture handler on touchpad
     exec --no-startup-id libinput-gestures-setup start
     # Set wallpaper
     exec --no-startup-id $set_wallpaper
     # Execute script of mine that handles tablet mode
     exec --no-startup-id $tablet_mode
+    # Execute script of mine that handles USB Card Module 
+    exec --no-startup-id $reload_module
     # Disable touchscreen default gestures
     exec --no-startup-id xsetwacom --set $(xsetwacom --list | grep -i touch | grep -o '[0-9]*' | tail -n 1 | tr -d '\n') Gesture off
+    # Notifications
+    exec --no-startup-id deadd-notification-center
+    # Auto-tiling module for a spiral tiling
+    exec_always --no-startup-id autotiling
+    # Open pavucontrol and pulseeffects
+    assign [class="Pavucontrol"] $ws10
+    exec --no-startup-id pavucontrol
+    #assign [class="Pulseeffects"] $ws9
+    #exec --no-startup-id pulseeffects --gapplication-service -l "Perfect EQ"
 
 # }}}
 
@@ -95,6 +108,8 @@
         bindsym $mod+Shift+d exec "dmenu_run"
     # }}}
 
+    # Toggle stickyness of focused container
+    bindsym $mod+shift+s sticky toggle
     # Open default terminal
     bindsym $mod+Return exec $term
 
@@ -103,6 +118,9 @@
 
     # Set wallpaper
     bindsym $mod+shift+w exec $set_wallpaper
+
+    # Change wallpaper to Writing Mode
+    bindsym $mod+ctrl+w exec feh --no-fehbg --bg-fill ~/Pictures/wallpapers/landscapes/pink_art_sky.jpg
 
     # Reload the configuration file
     bindsym $mod+Shift+c reload
@@ -138,6 +156,7 @@
 
         # Change focus between tiling / floating windows
         bindsym $mod+space focus mode_toggle
+
     # }}}
 
     # Move focused window {{{
@@ -207,7 +226,7 @@
         set $ws5 "5"
         set $ws6 "6"
         set $ws7 "7"
-        set $ws8 "8."
+        set $ws8 "8"
         set $ws9 "9"
         set $ws10 "10"
     # }}}
@@ -256,12 +275,12 @@
     for_window [class="^.*"] border pixel 0
     
     # Font for text border
-    font pango:Hack Nerd Font 8
+    font pango:Hack Nerd Font 10
 
     # Color of focused nodes's border
-    client.focused #292929 #292929 #ffffff #aa0000 #292929
+    client.focused #303030 #303030 #777777 #303030 #141414
     # Color of unfocused nodes's border
-    client.unfocused #202020 #202020 #777777 #aa0000 #292929
+    client.unfocused #222222 #222222 #777777 #222222 #222222
 
     # Align container title to center
     title_align center
@@ -272,6 +291,9 @@
 
     # mGBA config
     for_window[class="^mGBA$"] floating enable, move position center;
+    # LibFreenect
+    set $FLOAT_KINECT floating enable, border normal 0, sticky enable, move window to position 0 580 ;
+    for_window [title="LibFreenect"] $FLOAT_KINECT
 
     # TODO: use zenity to warn about battery level
     for_window [instance="zenity"] sticky enable
@@ -379,9 +401,9 @@
 
     bar {
         # Use i3bar as frame
-        i3bar_command i3bar
+        i3bar_command i3bar --transparency
         # Command to output information to ther bar
-        status_command bumblebee-status -m caffeine nic memory brightness amixer battery date time -p interval=2.5 time.format="%H:%M" date.format="%a, %b %d %Y" -t greyish-powerline
+        status_command bumblebee-status -m sensors memory nic brightness amixer battery date time -p interval=2.5 time.format="%H:%M" date.format="%a, %b %d %Y" -t greyish-powerline
         # Show it on primary monitor
         tray_output primary
         # Place it on top of the screen
@@ -393,7 +415,7 @@
 
         # Colours of the bar itself and i3 workspaces module
         colors {
-            background #000000
+            background #00000000
 
             # Color of the border, background and text of the i3 module buttons
             focused_workspace #aaaaaaff #909090ff #303030ff
