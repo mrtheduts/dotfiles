@@ -38,7 +38,7 @@
     exec_always --no-startup-id autotiling
     # Open pavucontrol and pulseeffects
     assign [class="Pavucontrol"] $ws10
-    exec --no-startup-id pavucontrol
+    # exec --no-startup-id pavucontrol
     #assign [class="Pulseeffects"] $ws9
     #exec --no-startup-id pulseeffects --gapplication-service -l "Perfect EQ"
 

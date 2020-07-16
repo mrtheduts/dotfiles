@@ -25,10 +25,17 @@ if has('nvim')
     " Doorboy - Autoclose brackets
     Plug 'itmammoth/doorboy.vim'
 
+    " Goyo - Distraction free vim
+    Plug 'junegunn/goyo.vim'
+
     " Gundo - View vim undo tree
     Plug 'sjl/gundo.vim'
 
-    Plug 'bilalq/lite-dfm'
+    " Gruvbox - Vim theme
+    Plug 'morhetz/gruvbox'
+
+    " IndentLine - pretty self explicatory
+    Plug 'Yggdroot/indentLine'
 
     " Markdown-Preview
     Plug 'iamcco/markdown-preview.nvim', { 
@@ -43,11 +50,6 @@ if has('nvim')
 
     " Nerdtree git integration
     Plug 'Xuyuanp/nerdtree-git-plugin'
-
-    " One Half - colour scheme
-    Plug 'sonph/onehalf', {
-    \ 'rtp': 'vim/'
-    \ }
 
     " vim-Airline - Status line for vim
     Plug 'vim-airline/vim-airline'
@@ -81,13 +83,20 @@ endif
 " Colour {{{
 if has('nvim')
 
-    colorscheme onehalfdark
-	let g:airline_theme='onehalfdark'
+    " These configs have to be loaded before gruvbox
+    let g:gruvbox_italic = '1'
 
-    " Change floating window color to make informations readable
-    hi link Cocfloating onehalfdark
-endif
-" }}}
+    let g:gruvbox_number_column = 'bg0'
+    let g:gruvbox_sign_column = 'bg0'
+
+    let g:gruvbox_invert_signs = '1'
+    
+    " True Color output
+    set termguicolors
+    colorscheme gruvbox
+    let g:airline_theme='gruvbox'
+
+endif " }}}
 
 " Folding {{{
 
@@ -129,6 +138,9 @@ endif
 
 " Misc {{{
 
+    " Enable Writer Mode
+    nnoremap <Leader>w :PencilSoft<CR>:Goyo<CR>
+
     " WARNING
     " jk is esc
     inoremap jk <esc>
@@ -139,7 +151,7 @@ endif
     noremap <Leader>p "+p
 
     " Turn off search highlight
-    nnoremap <leader><space> :nohlsearch<CR>
+    nnoremap <leader>/ :nohlsearch<CR>
 
 " }}}
 
@@ -370,6 +382,15 @@ if has('nvim')
     let g:doorboy_additional_quotations = {
         \ 'tex': ['$']
     \ }
+
+endif
+" }}}
+
+" IndentLine {{{
+if has('nvim')
+
+    " Set indent chars list
+    let g:indentLine_char_list = ['|', '¦', '┆', '┊']
 
 endif
 " }}}
