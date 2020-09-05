@@ -1,1 +1,4 @@
-/home/mrtheduts/Scripts/tablet-mode-on.sh
+#!/bin/bash
+i3-msg bar mode dock
+onboard &
+exit 0
