@@ -58,6 +58,12 @@ if has('nvim')
     " vim-Autotag - Update ctags
     Plug 'craigemery/vim-autotag'
 
+    " vim-Clang-Format - C family lint
+    Plug 'rhysd/vim-clang-format'
+
+    " vim-Closetag - Autoclose (X)HTML tags
+    Plug 'alvan/vim-closetag'
+
     " vim-Fugitive - Git wrapper
     Plug 'tpope/vim-fugitive'
 
@@ -75,6 +81,9 @@ if has('nvim')
     " One to rule them all
     Plug 'sheerun/vim-polyglot'
 
+    " Snippets are separated from the engine. Add this if you want them:
+    Plug 'honza/vim-snippets'
+
     call plug#end()
 
 endif
@@ -83,7 +92,7 @@ endif
 " Colour {{{
 if has('nvim')
 
-    " These configs have to be loaded before gruvbox
+    " These configs have to be loaded before gruvbox plugin
     let g:gruvbox_italic = '1'
 
     let g:gruvbox_number_column = 'bg0'
@@ -93,10 +102,18 @@ if has('nvim')
     
     " True Color output
     set termguicolors
+
+    " Set theme
     colorscheme gruvbox
     let g:airline_theme='gruvbox'
 
-endif " }}}
+    " c++ syntax highlighting
+    let g:cpp_class_scope_highlight = 1
+    let g:cpp_member_variable_highlight = 1
+    let g:cpp_class_decl_highlight = 1
+
+endif
+" }}}
 
 " Folding {{{
 
@@ -130,8 +147,10 @@ if has('nvim')
     " Add coc status on statusline
     set statusline^=%{coc#status()}
 
-endif
+    " Prevents snippets to conceal latex commands as single characters
+    let g:tex_conceal = ""
 
+endif
 " }}}
 
 " Remaping {{{
@@ -152,6 +171,9 @@ endif
 
     " Turn off search highlight
     nnoremap <leader>/ :nohlsearch<CR>
+
+    " C Lang Formatting
+    nnoremap <Leader>f :<C-u>ClangFormat<CR>
 
 " }}}
 
@@ -220,8 +242,11 @@ endif
     " Set tab space the same as the line above
     set smarttab
 
-    " Set tab for 2 in python files
+    " Set tab for 2 in specific files
     autocmd FileType python setlocal shiftwidth=2 tabstop=2 softtabstop=2
+    autocmd FileType typescriptreact setlocal shiftwidth=2 tabstop=2 softtabstop=2
+    autocmd FileType typescript setlocal shiftwidth=2 tabstop=2 softtabstop=2
+    autocmd FileType cpp setlocal shiftwidth=2 tabstop=2 softtabstop=2
 
 " }}}
 
@@ -250,7 +275,7 @@ endif
     " Show command in bottom bar
     set showcmd
 
-    " Highlidht current line
+    " Highlight current line
     set cursorline
 
     " Load filetype-specific ident files
@@ -275,6 +300,7 @@ endif
 " Aerojump {{{
 if has('nvim')
 
+    " Fuzzy search in file
     nmap <space> <plug>(AerojumpDefault)
     nmap <leader><space> <plug>(AerojumpBolt)
 
@@ -302,8 +328,14 @@ if has('nvim')
     " don't give |ins-completion-menu| messages.
     set shortmess+=c
 
-    " always show signcolumns
-    set signcolumn=yes
+    " Always show the signcolumn, otherwise it would shift the text each time
+    " diagnostics appear/become resolved.
+    if has("patch-8.1.1564")
+      " Recently vim can merge signcolumn and number column into one
+      set signcolumn=number
+    else
+      set signcolumn=yes
+    endif
 
     " Use tab for trigger completion with characters ahead and navigate.
     " Use command ':verbose imap <tab>' to make sure tab is not mapped
@@ -319,9 +351,18 @@ if has('nvim')
       return !col || getline('.')[col - 1]  =~# '\s'
     endfunction
 
-    " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
-    " Coc only does snippet and additional edit on confirm.
-    inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+    
+    " Use <c-space> to trigger completion.
+    inoremap <silent><expr> <c-space> coc#refresh()
+
+    " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
+    " position. Coc only does snippet and additional edit on confirm.
+    " <cr> could be remapped by other vim plugin, try `:verbose imap <CR>`.
+    if exists('*complete_info')
+      inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u" . doorboy#map_cr()
+    else
+      inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u" . doorboy#map_cr()
+    endif
 
     " Use K to show documentation in preview window
     nnoremap <silent> K :call <SID>show_documentation()<CR>
@@ -337,27 +378,43 @@ if has('nvim')
     " Highlight symbol under cursor on CursorHold
     autocmd CursorHold * silent call CocActionAsync('highlight')
 
+    " Symbol renaming.
+    nmap <leader>rn <Plug>(coc-rename)
+
     " Using CocList
     " Show all diagnostics
     nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
     " Show commands
     nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
 
+    " Remap keys for gotos
+    nmap <silent> gd <Plug>(coc-definition)
+    nmap <silent> gy <Plug>(coc-type-definition)
+    nmap <silent> gi <Plug>(coc-implementation)
+    nmap <silent> gr <Plug>(coc-references)
+
+    " CocActions
+    nmap <silent> <leader>a :<C-u>CocCommand actions.open<CR>
+
+    " Apply AutoFix to problem on the current line.
+    nmap <leader>qf  <Plug>(coc-fix-current)
+
     " TeXLab build shortcut
     nnoremap <silent> <leader>lb :<C-u>CocCommand latex.Build<cr>
 
     " clangd swap between header and file
-    nnoremap <silent> <leader>H :<C-u>CocCommand clangd.switchSourceHeader<cr>
-    " CocActions
-    nmap <silent> <leader>a :<C-u>CocCommand actions.open<CR>
+    nnoremap <silent> <leader>h :<C-u>CocCommand clangd.switchSourceHeader<cr>
+
 endif
 
 " }}}
 
 " Colorizer {{{
 if has('nvim')
+
     " Colorize automatically some filetypes
     let g:colorizer_auto_filetype='css,html,typescriptreact'
+
 endif
 " }}}
 
@@ -398,8 +455,13 @@ endif
 " Gundo {{{
 if has('nvim')
 
+    " Window appears on the right side
     let g:gundo_right = 1
+
+    " Diff appears on the bottom
     let g:gundo_preview_bottom = 1
+
+    " Remap to toggle Gundo
     nnoremap <leader>u :GundoToggle<CR>
 
 endif
@@ -415,7 +477,7 @@ if has('nvim')
     " Add spaces after comment delimiters by default
     let g:NERDSpaceDelims = 1
 
-    " Enable trimming of trailing whitespace when uncommenting
+    " Enable trimming of trailing whitespace when uncomment
     let g:NERDTrimTrailingWhitespace = 1
 
 endif
@@ -465,18 +527,28 @@ endif
 
 " }}}
 
+" vim-Closetag {{{
+if has('nvim')
+
+    " Enable autoclose for specific files
+    let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.tsx'
+
+endif
+" }}}
+
 " vim-Grepper {{{
 
 if has('nvim')
 
     " Mapping to Grepper on opened buffers
-    nnoremap <leader>g :Grepper -buffers<cr>
+    nnoremap <leader>g :Grepper -tool ag -buffers<cr>
     " Map to Grepper with Ag
-    nnoremap <leader>G :GrepperAg<cr>
+    nnoremap <leader>G :Grepper -tool ag<cr>
 
 endif
 
 " }}}
+
 
 " }}}
 
