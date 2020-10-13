@@ -91,6 +91,9 @@
 
         # Execute Flameshot with edit tools
         bindsym ctrl+Print exec flameshot gui
+
+        # Save Screen with Flameshot
+        bindsym shift+Print exec flameshot full -p ~/Pictures/Screenshots
     # }}}
 
     # Floating video mode {{{
@@ -300,7 +303,7 @@
     # mGBA config
     for_window[class="^mGBA$"] floating enable, move position center;
     # LibFreenect
-    set $FLOAT_KINECT floating enable, border normal 0, sticky enable, move window to position 0 580 ;
+    set $FLOAT_KINECT floating enable, border normal 0, sticky enable, move window to position 2560 0
     for_window [title="LibFreenect"] $FLOAT_KINECT
 
     # TODO: use zenity to warn about battery level
@@ -316,7 +319,7 @@
     for_window [title="dropdown"] floating enable, move scratchpad;
 
     # Bindsym to toggle it
-    bindsym $mod+t [title="dropdown"] resize set 700 400 ; scratchpad show ; [title="dropdown"] move position center
+    bindsym $mod+t [title="dropdown"] resize set 700 500 ; scratchpad show ; [title="dropdown"] move position center
 
 # }}}
 
@@ -368,14 +371,14 @@
 
     # Monitor {{{
     # Mode to choose which screen to output to
-        set $mode_monitor Monitor (n)notebook, (h)dmi, extend (a)bove
+        set $mode_monitor Monitor (n)notebook, (h)dmi, (e)xtend sideways
         mode "$mode_monitor" {
             # Use notebook screen
             bindsym n exec --no-startup-id "xrandr --output eDP1 --auto --primary && xrandr --output HDMI1 --off && $set_wallpaper && $wacom_to_edp1", mode "default"
             # Use HDMI
             bindsym h exec --no-startup-id "xrandr --output HDMI1 --auto --primary && xrandr --output eDP1 --off && $set_wallpaper", mode "default"
             # Extend HDMI above notebook screen
-            bindsym a exec --no-startup-id "xrandr --output eDP1 --auto --primary && xrandr --output HDMI1 --auto --above eDP1 --noprimary && $wacom_to_edp1", mode "default"
+            bindsym e exec --no-startup-id "xrandr --output HDMI1 --auto --primary && xrandr --output eDP1 --auto --right-of HDMI1 --noprimary", mode "default"
             # Mirror (unused)
             #bindsym m exec --no-startup-id "xrandr --output eDP1 --auto --primary && xrandr --output HDMI1 --auto --same-as eDP1 --noprimary", mode "default"
 
@@ -411,7 +414,7 @@
         # Use i3bar as frame
         i3bar_command i3bar --transparency
         # Command to output information to ther bar
-        status_command bumblebee-status -m sensors memory nic brightness amixer battery date time -p interval=2.5 time.format="%H:%M" date.format="%a, %b %d %Y" -t greyish-powerline
+        status_command bumblebee-status -m sensors memory disk nic brightness amixer battery date time -p interval=2.5 disk.path=/home time.format="%H:%M" date.format="%a, %b %d %Y" -t greyish-powerline
         # Show it on primary monitor
         tray_output primary
         # Place it on top of the screen

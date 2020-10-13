@@ -70,6 +70,9 @@ if has('nvim')
     " vim-Grepper - Use Ag (grep inside multiple files) inside nvim
     Plug 'mhinz/vim-grepper'
 
+    " vim-Hexokinase - Asynchronously displays colours
+    Plug 'rrethy/vim-hexokinase', { 'do': 'make hexokinase' }
+
     " vim-LSP-CXX-Highlight
     Plug 'jackguo380/vim-lsp-cxx-highlight'
 
@@ -243,7 +246,7 @@ endif
     set smarttab
 
     " Set tab for 2 in specific files
-    autocmd FileType python setlocal shiftwidth=2 tabstop=2 softtabstop=2
+    " autocmd FileType python setlocal shiftwidth=2 tabstop=2 softtabstop=2
     autocmd FileType typescriptreact setlocal shiftwidth=2 tabstop=2 softtabstop=2
     autocmd FileType typescript setlocal shiftwidth=2 tabstop=2 softtabstop=2
     autocmd FileType cpp setlocal shiftwidth=2 tabstop=2 softtabstop=2
@@ -261,6 +264,10 @@ endif
 " }}}
 
 " UI Layout {{{
+
+    " Hexokinase location
+    autocmd VimEnter * HexokinaseTurnOff
+    let g:Hexokinase_highlighters = [ 'backgroundfull' ]
 
     " Show line numbers as relative
     :set number relativenumber
@@ -445,6 +452,12 @@ endif
 
 " IndentLine {{{
 if has('nvim')
+
+    " Starts desabled
+    let g:indentLine_enabled = 0
+
+    " Shortcute to enable it
+    nnoremap <Leader>i :IndentLinesToggle<CR>
 
     " Set indent chars list
     let g:indentLine_char_list = ['|', '¦', '┆', '┊']
