@@ -8,11 +8,9 @@
     # Command to lock the screen
     set $lockscreen "physlock -p 'Hello, friend' -m"
     # Wallpaper setter
-    set $set_wallpaper DISPLAY=:0 sh ~/.fehbg
-    # Command to execute script of mine that handles tablet mode
-    set $tablet_mode ~/Scripts/easy-tablet.sh -s "~/Scripts/tablet-mode-on.sh","~/Scripts/tablet-mode-off.sh"
+    set $set_wallpaper feh --no-fehbg --randomize --bg-fill ~/Pictures/Wallpapers/Konosuba
     # Command to execute script changing USB_Sound_Card module
-    set $reload_module ~/Scripts/unload-and-load-right-module-USB_Sound.sh
+    set $reload_line_in_module ~/Scripts/unload-and-load-line-in-module.sh
     # Default terminal
     set $term terminator
 
@@ -22,25 +20,14 @@
 
     # Window compositor
     exec --no-startup-id picom -b --config ~/.config/picom/picom.conf
-    # Custom gesture handler on touchpad
-    exec --no-startup-id libinput-gestures-setup start
     # Set wallpaper
     exec --no-startup-id $set_wallpaper
-    # Execute script of mine that handles tablet mode
-    exec --no-startup-id $tablet_mode
     # Execute script of mine that handles USB Card Module 
-    exec --no-startup-id $reload_module
-    # Disable touchscreen default gestures
-    exec --no-startup-id xsetwacom --set $(xsetwacom --list | grep -i touch | grep -o '[0-9]*' | tail -n 1 | tr -d '\n') Gesture off
-    # Notifications
-    exec --no-startup-id deadd-notification-center
-    # Auto-tiling module for a spiral tiling
-    exec_always --no-startup-id autotiling
+    exec --no-startup-id $reload_line_in_module
     # Open pavucontrol and pulseeffects
     assign [class="Pavucontrol"] $ws10
-    # exec --no-startup-id pavucontrol
-    #assign [class="Pulseeffects"] $ws9
-    #exec --no-startup-id pulseeffects --gapplication-service -l "Perfect EQ"
+    assign [class="Pulseeffects"] $ws10
+    # exec --no-startup-id pulseeffects --gapplication-service -l "Bass Enhancing + Perfect EQ"
 
 # }}}
 
@@ -69,19 +56,12 @@
         bindsym XF86AudioPrev exec playerctl previous
     # }}}
 
-    # Brightness controls {{{
-        # Raise brightness in 5%
-        bindsym XF86MonBrightnessUp exec light -A 5
-        # Lower brightness in 5%
-        bindsym XF86MonBrightnessDown exec light -U 5
-    # }}}
-
     # Printscreen {{{
         # Import root window as png and save to clipboard
         bindsym Print exec import -window root png:- | xclip -selection clipboard -t image/png
 
         # Import focused window as png and save to clipboard
-        # TODO: make it work for floating focused windows
+        # TODO: make it work for floating focused windows. Is it possible?
         bindsym $mod+Print exec \
         import -window $( \
             i3-msg -t get_tree | \
@@ -106,7 +86,7 @@
  
     # Application openers {{{
         # Rofi with run and window mode 
-        bindsym $mod+d exec "rofi -modi combi -combi-modi window,drun -show combi -theme Pop-Dark"
+        bindsym $mod+d exec "rofi -modi combi -combi-modi window,drun -show combi -theme sidebar -show-icons -font 'NotoSans Nerd Font 14'"
         # dmenu for when in tablet mode
         bindsym $mod+Shift+d exec "dmenu_run"
     # }}}
@@ -302,12 +282,6 @@
 
     # mGBA config
     for_window[class="^mGBA$"] floating enable, move position center;
-    # LibFreenect
-    set $FLOAT_KINECT floating enable, border normal 0, sticky enable, move window to position 2560 0
-    for_window [title="LibFreenect"] $FLOAT_KINECT
-
-    # TODO: use zenity to warn about battery level
-    for_window [instance="zenity"] sticky enable
 
 # }}}
 
@@ -347,49 +321,6 @@
         bindsym $mod+Escape mode "$mode_system"
     # }}}
 
-    # Set Wacom {{{
-    # Mode to choose which screen to map the wacom input to
-        set $wacom_to_edp1 xsetwacom set 'Wacom HID 5107 Pen stylus' MapToOutput eDP1 && \
-            xsetwacom set 'Wacom HID 5107 Pen eraser' MapToOutput eDP1 && \
-            xsetwacom set 'Wacom HID 5107 Finger touch' MapToOutput eDP1
-
-        set $wacom_to_hdmi1 xsetwacom set 'Wacom HID 5107 Pen stylus' MapToOutput HDMI1 && \
-            xsetwacom set 'Wacom HID 5107 Pen eraser' MapToOutput HDMI1 && \
-            xsetwacom set 'Wacom HID 5107 Finger touch' MapToOutput HDMI1
-
-        set $mode_set_wacom Map Wacom Output to (h)dmi or (e)dp
-        mode "$mode_set_wacom" {
-            bindsym h exec --no-startup-id "$wacom_to_hdmi1", mode "default"
-            bindsym e exec --no-startup-id "$wacom_to_edp1", mode "default"
-
-            # Back to normal: Enter or Escape
-            bindsym Return mode "default"
-            bindsym Escape mode "default"
-        }
-        bindsym $mod+shift+p mode "$mode_set_wacom"
-    # }}}
-
-    # Monitor {{{
-    # Mode to choose which screen to output to
-        set $mode_monitor Monitor (n)notebook, (h)dmi, (e)xtend sideways
-        mode "$mode_monitor" {
-            # Use notebook screen
-            bindsym n exec --no-startup-id "xrandr --output eDP1 --auto --primary && xrandr --output HDMI1 --off && $set_wallpaper && $wacom_to_edp1", mode "default"
-            # Use HDMI
-            bindsym h exec --no-startup-id "xrandr --output HDMI1 --auto --primary && xrandr --output eDP1 --off && $set_wallpaper", mode "default"
-            # Extend HDMI above notebook screen
-            bindsym e exec --no-startup-id "xrandr --output HDMI1 --auto --primary && xrandr --output eDP1 --auto --right-of HDMI1 --noprimary", mode "default"
-            # Mirror (unused)
-            #bindsym m exec --no-startup-id "xrandr --output eDP1 --auto --primary && xrandr --output HDMI1 --auto --same-as eDP1 --noprimary", mode "default"
-
-            # Back to normal: Enter or Escape
-            bindsym Return mode "default"
-            bindsym Escape mode "default"
-            bindsym $mod+p mode "default"
-        }
-        bindsym $mod+p mode "$mode_monitor"
-    # }}}
-
     # Resize {{{
     # Mode to resize containers
         mode "Resize" {
@@ -414,9 +345,7 @@
         # Use i3bar as frame
         i3bar_command i3bar --transparency
         # Command to output information to ther bar
-        status_command bumblebee-status -m sensors memory disk nic brightness amixer battery date time -p interval=2.5 disk.path=/home time.format="%H:%M" date.format="%a, %b %d %Y" -t greyish-powerline
-        # Show it on primary monitor
-        tray_output primary
+        status_command bumblebee-status -m sensors memory disk nic amixer date time -p interval=2.5 disk.path=/home time.format="%H:%M" date.format="%a, %b %d %Y" -t greyish-powerline
         # Place it on top of the screen
         position top
 
@@ -429,13 +358,13 @@
             background #00000000
 
             # Color of the border, background and text of the i3 module buttons
-            focused_workspace #aaaaaaff #909090ff #303030ff
-            inactive_workspace #0a0a0aff #0a0a0aff #909090ff
-            urgent_workspace #ffffffff #af1818ff #ffffffff
+            focused_workspace   #aaaaaaff #909090ff #303030ff
+            inactive_workspace  #0a0a0aff #0a0a0aff #909090ff
+            urgent_workspace    #ffffffff #af1818ff #ffffffff
         }
 
         # Font
-        font pango:NotoSans Nerd Font 8
+        font pango:NotoSans Nerd Font 9
         # Show only workspace name after ":", if used
         strip_workspace_numbers yes
         # Space used near screen edges
