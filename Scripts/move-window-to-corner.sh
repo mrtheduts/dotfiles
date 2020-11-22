@@ -22,10 +22,10 @@
 # Author: Eduardo "mrtheduts" Souza
 
 # Base Values
-base_screen_height=768
+base_screen_height=1080
 
-base_window_width=440
-base_window_height=247
+base_window_width=550
+base_window_height=312
 
 # Information fetching
 window_id=$(i3-msg -t get_tree | jq 'recurse(.nodes[]) | select(.focused).window')
