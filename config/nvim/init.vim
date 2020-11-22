@@ -734,9 +734,6 @@ endif
         let g:cpp_member_variable_highlight = 1
         let g:cpp_class_decl_highlight = 1
 
-        " C-family Lang linting
-        autocmd FileType c,cpp nnoremap <buffer> <Leader>fc :<C-u>ClangFormat<CR>
-
     endif
 "   }}}
 
