@@ -43,9 +43,6 @@ if has('nvim')
         " - Dictionaries for spell-checker
         "   https://github.com/iamcco/coc-cspell-dicts
 
-        " - Pop-up actions menu
-        "   https://github.com/iamcco/coc-actions
-
         " - Editing support for LaTeX documents (needs TexLab)
         "   https://github.com/fannheyward/coc-texlab
 
@@ -69,10 +66,6 @@ if has('nvim')
 
     "   }}}
 
-    " Editor Config - maintain consistent coding style
-    " https://github.com/editorconfig/editorconfig-vim
-    Plug 'editorconfig/editorconfig-vim'
-
     " CtrlP - Fuzzy File Search
     " https://github.com/ctrlpvim/ctrlp.vim
     Plug 'ctrlpvim/ctrlp.vim'
@@ -85,10 +78,6 @@ if has('nvim')
     " https://github.com/junegunn/goyo.vim
     Plug 'junegunn/goyo.vim'
 
-    " Gundo - View full vim undo tree
-    " https://github.com/sjl/gundo.vim
-    Plug 'sjl/gundo.vim'
-
     " IndentLine - Show indent lines
     " https://github.com/Yggdroot/indentLine
     Plug 'Yggdroot/indentLine'
@@ -99,13 +88,9 @@ if has('nvim')
         \ 'do': 'cd app & yarn install'
     \ }
 
-    " NerdCommenter - Commenting Plugin
-    " https://github.com/preservim/nerdcommenter
-    Plug 'scrooloose/nerdcommenter'
-
-    " Nerdtree file navigator
-    " https://github.com/preservim/nerdtree/
-    Plug 'scrooloose/nerdtree'
+    " NERDtree - File system explorer for the Vim editor
+    " https://github.com/preservim/nerdtree
+    Plug 'preservim/nerdtree'
 
     " Nerdtree git integration
     " https://github.com/Xuyuanp/nerdtree-git-plugin
@@ -125,6 +110,14 @@ if has('nvim')
     " https://github.com/alvan/vim-closetag
     Plug 'alvan/vim-closetag'
 
+    " vim-Commentary - Comment stuff out
+    " https://github.com/tpope/vim-commentary
+    Plug 'tpope/vim-commentary'
+
+    " vim-clang-format
+    " https://github.com/rhysd/vim-clang-format
+    Plug 'rhysd/vim-clang-format'
+
     " vim-DevIcons - File icons inside vim
     " https://github.com/ryanoasis/vim-devicons
     Plug 'ryanoasis/vim-devicons'
@@ -132,6 +125,10 @@ if has('nvim')
     " vim-Easymotion - Jump to target inside file
     " https://github.com/easymotion/vim-easymotion
     Plug 'easymotion/vim-easymotion'
+
+    " vim-Eunuch - Sugar for UNIX shell commands
+    " https://github.com/tpope/vim-eunuch
+    Plug 'tpope/vim-eunuch'
 
     " vim-Fugitive - Git wrapper for vim
     " https://github.com/tpope/vim-fugitive
@@ -149,7 +146,11 @@ if has('nvim')
     " https://github.com/jackguo380/vim-lsp-cxx-highlight
     Plug 'jackguo380/vim-lsp-cxx-highlight'
 
-    " vim-Nerdtree-Syntax-Highlight - Different colours for files
+    " vim-Mundo - Visualize vim undo tree
+    " https://github.com/simnalamburt/vim-mundo
+    Plug 'simnalamburt/vim-mundo'
+
+    "vim-Nerdtree-Syntax-Highlight - Colour syntax for NERDTree
     " https://github.com/tiagofumo/vim-nerdtree-syntax-highlight
     Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 
@@ -168,6 +169,10 @@ if has('nvim')
     " vim-Surround - Surround text object with everything
     " https://github.com/tpope/vim-surround
     Plug 'tpope/vim-surround'
+
+    " winresizer - Easier way to resize windows
+    " https://github.com/simeji/winresizer
+    Plug 'simeji/winresizer'
 
     call plug#end()
 
@@ -336,11 +341,11 @@ endif
     " Buffers {{{
 
         " Switch between buffers easily with tab and shift+tab
-        nnoremap <TAB> :bnext<CR>
+        nnoremap <A-TAB> :bnext<CR>
         nnoremap <S-TAB> :bprev<CR>
 
-        " Close opened buffer
-        map <leader>q :bp<bar>sp<bar>bn<bar>bd<CR>
+        " Close opened buffer without closing window
+        map <leader>c :bp<bar>sp<bar>bn<bar>bd<CR>
 
         " Close quickfixes (some splits) with esc
         augroup vimrcQfClose
@@ -375,6 +380,10 @@ endif
 
     " Enable line for file-specifc configuration
     set modelines=1
+
+    " Enable persistent undo so that undo history persists across vim sessions
+    set undofile
+    set undodir=~/.config/nvim/undo
 
 " }}}
 
@@ -446,18 +455,30 @@ endif
 
 
                 " Use <c-space> to trigger completion.
-                inoremap <silent><expr> <c-space> coc#refresh()
-
-                " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
-                " position. Coc only does snippet and additional edit on confirm.
-                " <cr> could be remapped by other vim plugin, try `:verbose imap <CR>`.
-                if exists('*complete_info')
-                  inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u" . doorboy#map_cr()
+                if has('nvim')
+                  inoremap <silent><expr> <c-space> coc#refresh()
                 else
-                  inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u" . doorboy#map_cr()
+                  inoremap <silent><expr> <c-@> coc#refresh()
                 endif
 
-            " }}}
+                " Make <CR> auto-select the first completion item and notify coc.nvim to
+                " format on enter, <cr> could be remapped by other vim plugin
+                inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
+                                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+                " Use <C-l> for trigger snippet expand.
+                imap <C-l> <Plug>(coc-snippets-expand)
+
+                " Use <C-j> for select text for visual placeholder of snippet.
+                vmap <C-j> <Plug>(coc-snippets-select)
+
+                " Use <C-j> for both expand and jump (make expand higher priority.)
+                imap <C-j> <Plug>(coc-snippets-expand-jump)
+
+                " Use <leader>x for convert visual selected code to snippet
+                xmap <leader>x  <Plug>(coc-convert-snippet)
+
+                " }}}
 
             " Go to file/doc {{{
 
@@ -486,17 +507,33 @@ endif
                 " Symbol renaming.
                 nmap <leader>rn <Plug>(coc-rename)
 
-                " Using CocList
-                " Show all diagnostics
-                nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
-                " Show commands
-                nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
+                " Applying codeAction to the selected region.
+                " Example: `<leader>aap` for current paragraph
+                xmap <leader>a  <Plug>(coc-codeaction-selected)
+                nmap <leader>a  <Plug>(coc-codeaction-selected)
 
-                " CocActions
-                nmap <silent> <leader>a :<C-u>CocCommand actions.open<CR>
-
+                " Remap keys for applying codeAction to the current buffer.
+                nmap <leader>ac  <Plug>(coc-codeaction)
                 " Apply AutoFix to problem on the current line.
                 nmap <leader>qf  <Plug>(coc-fix-current)
+
+                " Remap <C-f> and <C-b> for scroll float windows/popups.
+                if has('nvim-0.4.0') || has('patch-8.2.0750')
+                  nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+                  nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+                  inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
+                  inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
+                  vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+                  vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+                endif
+                
+                " Using CocList
+                " Show all diagnostics
+                nnoremap <silent><nowait> <space>a  :<C-u>CocList diagnostics<cr>
+                " Manage extensions.
+                nnoremap <silent><nowait> <space>e  :<C-u>CocList extensions<cr>
+                " Show commands
+                nnoremap <silent><nowait> <space>c  :<C-u>CocList commands<cr>
 
                 " TeXLab build shortcut
                 autocmd FileType plaintex nnoremap <buffer> <silent> <leader>lb :<C-u>CocCommand latex.Build<cr>
@@ -518,6 +555,28 @@ endif
         let g:EditorConfig_exclude_patterns = ['fugitive://.*', 'scp://.*']
 
     endif
+    " }}}
+
+    " NERDTree settings {{{
+    if has('nvim')
+
+        " NERDTree remaping
+        map <C-A-n> :NERDTreeToggle<cr>
+
+        let g:NERDTreeWinSize = 45
+
+        let g:WebDevIconsDisableDefaultFolderSymbolColorFromNERDTreeDir = 1
+        let g:WebDevIconsDisableDefaultFileSymbolColorFromNERDTreeFile = 1
+
+        " Open nerdtree if nvim opened a directory
+        autocmd StdinReadPre * let s:std_in=1
+        autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | exe 'cd '.argv()[0] | endif
+
+        " Close nerdtree when file is opened
+        let NERDTreeQuitOnOpen = 1
+
+    endif
+
     " }}}
 
     " CtrlP settings {{{
@@ -543,14 +602,14 @@ endif
         let g:ctrlp_match_window = 'bottom,order:ttb'
 
         " Open file in new buffer
-        let g:ctrlp_switch_buffer = 0
+        let g:ctrlp_switch_buffer = 1
 
         " '... [It's possible to] change the working directory during
         " a vim session and make ctrlp respect that change' ~ dougblack
         let g:ctrlp_working_path_mode = 0
 
         " Tweak CtrlP speed with Ag
-        let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
+        " let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
 
     endif
     " }}}
@@ -571,25 +630,6 @@ endif
     endif
     " }}}
 
-    " Gundo {{{
-    if has('nvim')
-
-        " Window appears on the right side
-        let g:gundo_right = 1
-
-        " Diff appears on the bottom
-        let g:gundo_preview_bottom = 1
-
-        " No auto preview
-        let g:gundo_auto_preview = 0
-
-        " Remap to toggle Gundo
-        map <C-u> :GundoToggle<CR>
-
-    endif
-
-    " }}}
-
     " IndentLine {{{
     if has('nvim')
 
@@ -605,41 +645,20 @@ endif
     endif
     " }}}
 
-    " NerdCommenter {{{
+    " Mundo {{{
     if has('nvim')
 
-        " Add spaces after comment delimiters by default
-        let g:NERDSpaceDelims = 1
+        " Window appears on the right side
+        let g:mundo_right = 1
 
-        " Use compact syntax for prettified multi-line comments
-        let g:NERDCompactSexyComs = 1
+        " Diff appears on the bottom
+        let g:mundo_preview_bottom = 1
 
-        " Allow commenting and inverting empty lines (useful when commenting a region)
-        let g:NERDCommentEmptyLines = 1
+        " No auto preview
+        let g:mundo_auto_preview = 0
 
-        " Enable trimming of trailing whitespace when uncomment
-        let g:NERDTrimTrailingWhitespace = 1
-
-        " Enable NERDCommenterToggle to check all selected lines is commented or not
-        let g:NERDToggleCheckAllLines = 1
-
-    endif
-    " }}}
-
-    " Nerdtree settings {{{
-    if has('nvim')
-
-        " Nerdtree remaping
-        map <C-n> :NERDTreeRefreshRoot<CR>:NERDTreeToggle<CR>
-
-        " Open nerdtree if nvim opened a directory
-        autocmd StdinReadPre * let s:std_in=1
-        autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | exe 'cd '.argv()[0] | endif
-
-        " Close nerdtree when file is opened
-        let NERDTreeQuitOnOpen = 1
-        " Automatically delete the buffer of the file you just deleted in nerdtree
-        let NERDTreeAutoDeleteBuffer = 1
+        " Remap to toggle Gundo
+        map <C-A-u> :MundoToggle<CR>
 
     endif
 
@@ -649,7 +668,7 @@ endif
     if has('nvim')
 
         " Use nerdfonts
-        let g:NERDTreeGitStatusUseNerdFonts = 1
+        " let g:NERDTreeGitStatusUseNerdFonts = 1
 
     endif
     " }}}
@@ -669,6 +688,15 @@ endif
     endif
 
     " }}}
+
+" vim-Clang-format {{{
+if has('nvim')
+
+    let g:clang_format#detect_style_file=1
+    let g:clang_format#auto_format=1
+
+endif
+" }}}
 
     " vim-Closetag {{{
     if has('nvim')
@@ -720,6 +748,12 @@ endif
 " }}}
 
 " File-specific settings {{{
+
+" Angular (typescript and html) {{{
+if has('nvim')
+
+endif
+" }}}
  
 "   C/C++ {{{
 "
