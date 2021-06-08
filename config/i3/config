@@ -10,9 +10,11 @@
     # Wallpaper setter
     set $set_wallpaper feh --no-fehbg --randomize --bg-fill ~/Pictures/Wallpapers/Konosuba
     # Command to execute script changing USB_Sound_Card module
-    set $reload_line_in_module ~/Scripts/unload-and-load-line-in-module.sh
+    # set $reload_line_in_module ~/Scripts/unload-and-load-line-in-module.sh
     # Default terminal
     set $term terminator
+    # Notify daemon
+    set $notify_daemon "dunst -transparency 20 -font 'Firacode 12' -alignment right -corner_radius 12 -frame_width 0 -vertical_alignment top -separator_height 0"
 
 # }}}
 
@@ -25,9 +27,8 @@
     # Execute script of mine that handles USB Card Module 
     exec --no-startup-id $reload_line_in_module
     # Open pavucontrol and pulseeffects
-    assign [class="Pavucontrol"] $ws10
-    assign [class="Pulseeffects"] $ws10
     # exec --no-startup-id pulseeffects --gapplication-service -l "Bass Enhancing + Perfect EQ"
+    exec --no-startup-id $notify_daemon
 
 # }}}
 
@@ -91,19 +92,27 @@
         bindsym $mod+Shift+d exec "dmenu_run"
     # }}}
 
-    # Toggle stickyness of focused container
-    bindsym $mod+shift+s sticky toggle
+    # Containers-related {{{
+
+        # Toggle stickyness of focused container
+        bindsym $mod+shift+s sticky toggle
+
+        # Move window to center
+        bindsym $mod+c move position center
+
+    # }}}
+
     # Open default terminal
     bindsym $mod+Return exec $term
 
     # Toggle touchscreen On/Off with Power Button
-    bindsym XF86PowerOff exec /home/mrtheduts/Scripts/toggle-touchscreen.sh
+    # bindsym XF86PowerOff exec /home/mrtheduts/Scripts/toggle-touchscreen.sh
 
     # Set wallpaper
     bindsym $mod+shift+w exec $set_wallpaper
 
     # Change wallpaper to Writing Mode
-    bindsym $mod+ctrl+w exec feh --no-fehbg --bg-fill ~/Pictures/wallpapers/landscapes/pink_art_sky.jpg
+    # bindsym $mod+ctrl+w exec feh --no-fehbg --bg-fill ~/Pictures/wallpapers/landscapes/pink_art_sky.jpg
 
     # Reload the configuration file
     bindsym $mod+Shift+c reload
@@ -113,6 +122,12 @@
 
     # Exit i3 (logs you out of your X session)
     bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+
+    # Send to scratchpad
+    bindsym $mod+Shift+minus move scratchpad
+
+    # Bring back from scratchpad
+    bindsym $mod+minus scratchpad show
 
 # }}}
 
@@ -171,7 +186,7 @@
         bindsym $mod+e layout toggle split
 
         # Split in horizontal orientation
-        bindsym $mod+c split h
+        bindsym $mod+b split h
         # Split in vertical orientation
         bindsym $mod+v split v
     # }}}
@@ -180,8 +195,12 @@
         # Set key to move floating windows
         floating_modifier $mod
         # Set maximum size for floating windows
-        floating_maximum_size 1200 x 600
+        floating_maximum_size 1920 x 1080
     # }}}
+
+    # Toggle split into two monitors
+    bindsym $mod+Mod1+shift+s exec "/home/mrtheduts/Scripts/virmon.sh && i3-msg restart && $set_wallpaper", mode "default"
+
 
     # Only exit fullscreen if popup belongs to
     # the fullscreen application
@@ -234,6 +253,18 @@
         # Jump to previous workspace using 
         # the bindsym to jump to current workspace
         workspace_auto_back_and_forth yes
+
+        # Workspace Monitor Config
+        workspace $ws1 output HDMI-A-0~1 HDMI-A-0
+        workspace $ws2 output HDMI-A-0~1 HDMI-A-0
+        workspace $ws3 output HDMI-A-0~1 HDMI-A-0
+        workspace $ws4 output HDMI-A-0~1 HDMI-A-0
+        workspace $ws5 output HDMI-A-0~1 HDMI-A-0
+        workspace $ws6 output HDMI-A-0~2 HDMI-A-0
+        workspace $ws7 output HDMI-A-0~2 HDMI-A-0
+        workspace $ws8 output HDMI-A-0~2 HDMI-A-0
+        workspace $ws9 output HDMI-A-0~2 HDMI-A-0
+        workspace $ws10 output HDMI-A-0~2 HDMI-A-0
     # }}}
 
     # Move focused container {{{
@@ -283,21 +314,69 @@
     # mGBA config
     for_window[class="^mGBA$"] floating enable, move position center;
 
+    # Pavucontrol
+    assign [class="Pavucontrol"] $ws10
+
+    # Telegram
+    # assign [class="TelegramDesktop"] $ws8
+
+    # # Steam
+    # assign [class="Steam"] $ws9
+
+    # Google Play Music/Youtube Music
+    assign [class="Google Play Music Desktop Player"] $ws9
+
 # }}}
 
 # Quick terminal {{{
 
     # Execute terminal on startup
-    exec --no-startup-id terminator -T "dropdown"
+    # exec --no-startup-id terminator -T "dropdown"
     # Move it to scratchpad
-    for_window [title="dropdown"] floating enable, move scratchpad;
+    # for_window [title="dropdown"] floating enable, move scratchpad;
 
     # Bindsym to toggle it
-    bindsym $mod+t [title="dropdown"] resize set 700 500 ; scratchpad show ; [title="dropdown"] move position center
+    # bindsym $mod+t [title="dropdown"] resize set 900 700 ; scratchpad show ; [title="dropdown"] move position center
 
 # }}}
 
 # Modes {{{
+
+    # Container Edit Mode {{{
+
+        set $container_edit Edit containers: (B/b)order, (f)ull HD size, (H)alf-size, (h/j/k/l) resize, (o)ne-third, (t)wo-thirds size:
+        mode "$container_edit" {
+
+            # Set/unset border
+            bindsym b border pixel 0
+            bindsym shift+b border pixel 2
+
+            # Set container to FHD dimension
+            bindsym f resize set width 1920 px
+
+            # Set container to FHD dimension
+            bindsym shift+h resize set width 1280 px
+
+            # Resize container
+            bindsym h resize shrink width 1 px
+            bindsym j resize grow height 1 px
+            bindsym k resize shrink height 1 px
+            bindsym l resize grow width 1 px
+
+            # Set size to one-third
+            bindsym o resize set width 853 px
+
+            # Set size to two-thirds
+            bindsym t resize set width 1707 px
+
+            # Back to normal: Enter or Escape
+            bindsym Return mode "default"
+            bindsym Escape mode "default"
+            bindsym $mod+r mode "default"
+        }
+        bindsym $mod+r mode "$container_edit"
+
+    # }}}
 
     # System {{{
     # Mode to shutdown, reboot or suspend the machine ou exit i3wm
@@ -321,22 +400,6 @@
         bindsym $mod+Escape mode "$mode_system"
     # }}}
 
-    # Resize {{{
-    # Mode to resize containers
-        mode "Resize" {
-            bindsym Left resize shrink width 2 px or 2 ppt
-            bindsym Down resize grow height 2 px or 2 ppt
-            bindsym Up resize shrink height 2 px or 2 ppt
-            bindsym Right resize grow width 2 px or 2 ppt
-
-            # back to normal: Enter or Escape or $mod+r
-            bindsym Return mode "default"
-            bindsym Escape mode "default"
-            bindsym $mod+r mode "default"
-        }
-        bindsym $mod+r mode "resize"
-    # }}}
-
 # }}}
 
 # Bar {{{
@@ -345,9 +408,11 @@
         # Use i3bar as frame
         i3bar_command i3bar --transparency
         # Command to output information to ther bar
-        status_command bumblebee-status -m sensors memory disk nic amixer date time -p interval=2.5 disk.path=/home time.format="%H:%M" date.format="%a, %b %d %Y" -t greyish-powerline
+        status_command bumblebee-status -m sensors memory disk:root disk:home nic amixer date bashfuzzyclock -p interval=2.5 root.path=/ home.path=/home date.format="%a, %b %d %Y" -t greyish-powerline
         # Place it on top of the screen
         position top
+        output HDMI-A-0
+        output HDMI-A-0~1
 
         # Keep it hidden until $mod is held
         mode hide
@@ -372,6 +437,41 @@
 
     }
 
+# Bar-2 {{{
+
+    bar {
+        # Use i3bar as frame
+        i3bar_command i3bar --transparency
+        # Command to output information to ther bar
+        status_command bumblebee-status -m date bashfuzzyclock -p interval=2.5 date.format="%a, %b %d %Y" -t greyish-powerline
+        # Place it on top of the screen
+        position top
+        output HDMI-A-0~2
+
+        # Keep it hidden until $mod is held
+        mode hide
+        hidden_state hide
+
+        # Colours of the bar itself and i3 workspaces module
+        colors {
+            background #00000000
+
+            # Color of the border, background and text of the i3 module buttons
+            focused_workspace   #aaaaaaff #909090ff #303030ff
+            inactive_workspace  #0a0a0aff #0a0a0aff #909090ff
+            urgent_workspace    #ffffffff #af1818ff #ffffffff
+        }
+
+        # Font
+        font pango:NotoSans Nerd Font 9
+        # Show only workspace name after ":", if used
+        strip_workspace_numbers yes
+        # Space used near screen edges
+        tray_padding 1
+
+    }
+
+# }}}
 # }}}
 
 # Open this file with folded Sections
