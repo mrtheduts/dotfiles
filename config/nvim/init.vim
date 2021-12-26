@@ -144,7 +144,7 @@ if has('nvim')
 
     " vim-LSP-CXX-Highlight - Syntax colour from LSP data
     " https://github.com/jackguo380/vim-lsp-cxx-highlight
-    Plug 'jackguo380/vim-lsp-cxx-highlight'
+    " Plug 'jackguo380/vim-lsp-cxx-highlight'
 
     " vim-Mundo - Visualize vim undo tree
     " https://github.com/simnalamburt/vim-mundo
@@ -536,7 +536,7 @@ endif
                 nnoremap <silent><nowait> <space>c  :<C-u>CocList commands<cr>
 
                 " TeXLab build shortcut
-                autocmd FileType plaintex nnoremap <buffer> <silent> <leader>lb :<C-u>CocCommand latex.Build<cr>
+                autocmd FileType tex nnoremap <buffer> <silent> <leader>LB :<C-u>CocCommand latex.Build<cr>
 
                 " clangd swap between header and file
                 autocmd FileType c,cpp nnoremap <buffer> <silent> <leader>H :<C-u>CocCommand clangd.switchSourceHeader<cr>
@@ -764,9 +764,9 @@ endif
     if has('nvim')
 
         " C++ syntax highlighting
-        let g:cpp_class_scope_highlight = 1
-        let g:cpp_member_variable_highlight = 1
-        let g:cpp_class_decl_highlight = 1
+        " let g:cpp_class_scope_highlight = 1
+        " let g:cpp_member_variable_highlight = 1
+        " let g:cpp_class_decl_highlight = 1
 
     endif
 "   }}}
