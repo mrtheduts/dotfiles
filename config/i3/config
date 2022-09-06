@@ -8,7 +8,7 @@
     # Command to lock the screen
     set $lockscreen "physlock -p 'Hello, friend' -m"
     # Wallpaper setter
-    set $set_wallpaper feh --no-fehbg --randomize --bg-fill ~/Pictures/Wallpapers/Konosuba/chibi_gang/
+    set $set_wallpaper feh --no-fehbg --randomize --bg-fill ~/Imagens/Wallpapers/Galaxy/
     # Command to execute script changing USB_Sound_Card module
     # set $reload_line_in_module ~/Scripts/unload-and-load-line-in-module.sh
     # Default terminal
@@ -43,16 +43,16 @@
 
     # Pulse Audio controls {{{
         # Raise Master volume in 5%
-        bindsym XF86AudioRaiseVolume exec amixer -q -D pulse sset Master 5%+ on
+        bindsym XF86AudioRaiseVolume exec "~/Scripts/change_volume.sh i"
         # Lower Master volume in 5%
-        bindsym XF86AudioLowerVolume exec amixer -q -D pulse sset Master 5%- on
+        bindsym XF86AudioLowerVolume exec "~/Scripts/change_volume.sh d"
         # Toggle Master to mute/unmute
-        bindsym XF86AudioMute exec amixer -q -D pulse sset Master toggle
+        bindsym XF86AudioMute exec "~/Scripts/change_volume.sh m"
     # }}}
 
     # Media Player controls {{{
-        bindsym XF86AudioPlay exec playerctl play
-        bindsym XF86AudioPause exec playerctl pause
+        bindsym XF86AudioPlay exec playerctl play-pause
+        bindsym XF86AudioStop exec playerctl stop
         bindsym XF86AudioNext exec playerctl next
         bindsym XF86AudioPrev exec playerctl previous
     # }}}
@@ -199,8 +199,9 @@
     # }}}
 
     # Toggle split into two monitors
-    bindsym $mod+Mod1+shift+s exec "/home/mrtheduts/Scripts/virmon.sh FHD && i3-msg restart && $set_wallpaper", mode "default"
-    bindsym $mod+Mod1+shift+h exec "/home/mrtheduts/Scripts/virmon.sh HALF && i3-msg restart && $set_wallpaper", mode "default"
+    bindsym $mod+Mod1+shift+s exec "/home/mrtheduts/Scripts/virmon.sh QHD && i3-msg restart && $set_wallpaper", mode "default"
+    bindsym $mod+Mod1+shift+h exec "/home/mrtheduts/Scripts/virmon.sh QHD_HALF && i3-msg restart && $set_wallpaper", mode "default"
+    bindsym $mod+Mod1+shift+g exec "/home/mrtheduts/Scripts/virmon.sh STREAM && i3-msg restart && $set_wallpaper", mode "default"
 
 
     # Only exit fullscreen if popup belongs to
@@ -256,16 +257,16 @@
         workspace_auto_back_and_forth yes
 
         # Workspace Monitor Config
-        workspace $ws1 output HDMI-A-0~1 HDMI-A-0
-        workspace $ws2 output HDMI-A-0~1 HDMI-A-0
-        workspace $ws3 output HDMI-A-0~1 HDMI-A-0
-        workspace $ws4 output DisplayPort-2 HDMI-A-0~1 HDMI-A-0
-        workspace $ws5 output DisplayPort-2 HDMI-A-0~1 HDMI-A-0
-        workspace $ws6 output DisplayPort-0 HDMI-A-0~2 HDMI-A-0
-        workspace $ws7 output DisplayPort-0 HDMI-A-0~2 HDMI-A-0
-        workspace $ws8 output DisplayPort-1 HDMI-A-0~2 HDMI-A-0
-        workspace $ws9 output DisplayPort-1 DisplayPort-0 HDMI-A-0~2 HDMI-A-0
-        workspace $ws10 output DisplayPort-1 DisplayPort-0 HDMI-A-0~2 HDMI-A-0
+        workspace $ws1 output DisplayPort-0~1
+        workspace $ws2 output DisplayPort-0~1
+        workspace $ws3 output DisplayPort-0~3 DisplayPort-0~1
+        workspace $ws4 output DisplayPort-0~3 DisplayPort-0~1
+        workspace $ws5 output DisplayPort-0~2 DisplayPort-0~3 DisplayPort-0~1
+        workspace $ws6 output DisplayPort-0~2
+        workspace $ws7 output DisplayPort-0~2
+        workspace $ws8 output DisplayPort-0~2
+        workspace $ws9 output DisplayPort-0~2
+        workspace $ws10 output DisplayPort-0~2
     # }}}
 
     # Move focused container {{{
@@ -353,10 +354,10 @@
             bindsym shift+b border pixel 2
 
             # Set container to FHD dimension
-            bindsym f resize set width 1920 px
+            bindsym f resize set width 2560 px
 
-            # Set container to FHD dimension
-            bindsym shift+h resize set width 1280 px
+            # Set container to half-screen
+            bindsym shift+h resize set width 1720 px
 
             # Resize container
             bindsym h resize shrink width 1 px
@@ -409,13 +410,15 @@
         # Use i3bar as frame
         i3bar_command i3bar --transparency
         # Command to output information to ther bar
-        status_command bumblebee-status -m sensors memory disk:root disk:home nic amixer date bashfuzzyclock -p interval=2.5 root.path=/ home.path=/home date.format="%a, %b %d %Y" -t greyish-powerline
+        status_command bumblebee-status -m sensors memory disk:root disk:home nic pasink pasource datetime -p interval=1 root.path=/ home.path=/home date.format="%a, %b %d %Y" -t greyish-powerline
         # Place it on top of the screen
         position top
-        output HDMI-A-0
-        output HDMI-A-0~1
         output DisplayPort-0
-        output DisplayPort-1
+        output DisplayPort-0~1
+        # output HDMI-A-0
+        # output HDMI-A-0~1
+        # output DisplayPort-0
+        # output DisplayPort-1
         # output DisplayPort-2
 
 
@@ -448,10 +451,12 @@
         # Use i3bar as frame
         i3bar_command i3bar --transparency
         # Command to output information to ther bar
-        status_command bumblebee-status -m date bashfuzzyclock -p interval=2.5 date.format="%a, %b %d %Y" -t greyish-powerline
+        status_command bumblebee-status -t greyish-powerline
         # Place it on top of the screen
         position top
-        output HDMI-A-0~2
+        # output HDMI-A-0~2
+        output DisplayPort-0~2
+        output DisplayPort-0~3
 
         # Keep it hidden until $mod is held
         mode hide

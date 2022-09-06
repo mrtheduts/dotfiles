@@ -8,7 +8,7 @@ if has('nvim')
 
     " Aerojump - Easier (fuzzy) navigation in file
     " https://github.com/ripxorip/aerojump.nvim
-    Plug 'ripxorip/aerojump.nvim', { 'do': ':UpdateRemotePlugins' }
+    " Plug 'ripxorip/aerojump.nvim', { 'do': ':UpdateRemotePlugins' }
 
     " Breezy - vim theme
     " https://github.com/fneu/breezy
@@ -78,10 +78,6 @@ if has('nvim')
     " https://github.com/junegunn/goyo.vim
     Plug 'junegunn/goyo.vim'
 
-    " IndentLine - Show indent lines
-    " https://github.com/Yggdroot/indentLine
-    Plug 'Yggdroot/indentLine'
-
     " Markdown-Preview - Preview it in your browser
     " https://github.com/facelessuser/MarkdownPreview
     Plug 'iamcco/markdown-preview.nvim', {
@@ -134,9 +130,17 @@ if has('nvim')
     " https://github.com/tpope/vim-fugitive
     Plug 'tpope/vim-fugitive'
 
+    " vim-Godot - Godot + Vim
+    " https://github.com/habamax/vim-godot
+    Plug 'habamax/vim-godot'
+
     " vim-Grepper - Use Ag (grep inside multiple files) inside nvim
     " https://github.com/mhinz/vim-grepper/
     Plug 'mhinz/vim-grepper'
+
+    " vim-Gutentags - Async ctags integration in project
+    " https://github.com/ludovicchabant/vim-gutentags
+    Plug 'ludovicchabant/vim-gutentags'
 
     " vim-Hexokinase - Asynchronously displays colour previews
     " https://github.com/RRethy/vim-hexokinase
@@ -245,7 +249,7 @@ endif
     set wildmenu
 
     " Redraw only when we need to
-    set lazyredraw
+    " set lazyredraw
 
     " Highlight matching [{()}]
     set showmatch
