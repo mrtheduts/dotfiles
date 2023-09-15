@@ -5,30 +5,52 @@
 
     # $mod as Win key
     set $mod Mod4
+
     # Command to lock the screen
     set $lockscreen "physlock -p 'Hello, friend' -m"
+
     # Wallpaper setter
-    set $set_wallpaper feh --no-fehbg --randomize --bg-fill ~/Pictures/Wallpapers/Konosuba/chibi_gang/
+    set $set_wallpaper feh --no-fehbg --randomize --bg-fill /home/mrtheduts/Imagens/wallpapers/galaxies/purple_1.jpg
+
     # Command to execute script changing USB_Sound_Card module
     # set $reload_line_in_module ~/Scripts/unload-and-load-line-in-module.sh
+    #
     # Default terminal
     set $term terminator
+
     # Notify daemon
-    set $notify_daemon "dunst --config ~/config/dunst/dunstrc"
+    set $notify_daemon "dunst --config ~/.config/dunst/dunstrc"
+
+    # Polkit Agent
+    set $polkit_agent "polkit-dumb-agent"
+
+    # Window Compositor
+    set $window_compositor "picom -b --config ~/.config/picom/picom.conf"
+
+    # Touchscreen script
+    set $toggle-touchscreen "/home/mrtheduts/Scripts/toggle-touchscreen.sh TOGGLE"
+    set $off-touchscreen "/home/mrtheduts/Scripts/toggle-touchscreen.sh OFF"
 
 # }}}
 
 # Exec on startup {{{
 
     # Window compositor
-    exec --no-startup-id picom -b --config ~/.config/picom/picom.conf
+    exec --no-startup-id $window_compositor
     # Set wallpaper
     exec --no-startup-id $set_wallpaper
     # Execute script of mine that handles USB Card Module 
-    exec --no-startup-id $reload_line_in_module
+    # exec --no-startup-id $reload_line_in_module
     # Open pavucontrol and pulseeffects
     # exec --no-startup-id pulseeffects --gapplication-service -l "Bass Enhancing + Perfect EQ"
     exec --no-startup-id $notify_daemon
+
+    # polkit
+    exec --no-startup-id $polkit_agent
+
+    exec --no-startup-id libinput-gestures-setup start
+
+    exec --no-startup-id $off-touchscreen
 
 # }}}
 
@@ -88,6 +110,7 @@
     # Application openers {{{
         # Rofi with run and window mode 
         bindsym $mod+d exec "rofi -modi combi -combi-modi window,drun -show combi -theme sidebar -show-icons -font 'NotoSans Nerd Font 14'"
+
         # dmenu for when in tablet mode
         bindsym $mod+Shift+d exec "dmenu_run"
     # }}}
@@ -128,6 +151,13 @@
 
     # Bring back from scratchpad
     bindsym $mod+minus scratchpad show
+
+    # Change brightness
+    bindsym XF86MonBrightnessUp exec xbacklight -inc 10
+    bindsym XF86MonBrightnessDown exec xbacklight -dec 10
+
+    # Toggle touchscreen state
+    bindsym XF86PowerOff exec $toggle-touchscreen
 
 # }}}
 
@@ -195,7 +225,7 @@
         # Set key to move floating windows
         floating_modifier $mod
         # Set maximum size for floating windows
-        floating_maximum_size 1920 x 1080
+        floating_maximum_size 1000 x 540
     # }}}
 
     # Toggle split into two monitors
@@ -379,6 +409,27 @@
 
     # }}}
 
+    # Monitor {{{
+    # Mode to choose which screen to output to
+        set $mode_monitor Monitor (n)notebook, (h)dmi, (e)xtend sideways
+        mode "$mode_monitor" {
+            # Use notebook screen
+            bindsym n exec --no-startup-id "xrandr --output eDP1 --auto --primary && xrandr --output HDMI1 --off && $set_wallpaper && $wacom_to_edp1", mode "default"
+            # Use HDMI
+            bindsym h exec --no-startup-id "xrandr --output HDMI1 --auto --primary && xrandr --output eDP1 --off && $set_wallpaper", mode "default"
+            # Extend HDMI above notebook screen
+            bindsym e exec --no-startup-id "xrandr --output HDMI1 --auto --primary && xrandr --output eDP1 --auto --right-of HDMI1 --noprimary", mode "default"
+            # Mirror (unused)
+            #bindsym m exec --no-startup-id "xrandr --output eDP1 --auto --primary && xrandr --output HDMI1 --auto --same-as eDP1 --noprimary", mode "default"
+
+            # Back to normal: Enter or Escape
+            bindsym Return mode "default"
+            bindsym Escape mode "default"
+            bindsym $mod+p mode "default"
+        }
+        bindsym $mod+p mode "$mode_monitor"
+    # }}}
+ 
     # System {{{
     # Mode to shutdown, reboot or suspend the machine ou exit i3wm
         set $mode_system System (e)xit, (s)uspend, (r)eboot, (Shift+s) shutdown
@@ -409,19 +460,14 @@
         # Use i3bar as frame
         i3bar_command i3bar --transparency
         # Command to output information to ther bar
-        status_command bumblebee-status -m sensors memory disk:root disk:home nic amixer date bashfuzzyclock -p interval=2.5 root.path=/ home.path=/home date.format="%a, %b %d %Y" -t greyish-powerline
+        status_command bumblebee-status -m sensors memory disk:root disk:home nic amixer battery datetime -p interval=2.5 root.path=/ home.path=/home date.format="%a, %b %d %Y" -t greyish-powerline
         # Place it on top of the screen
         position top
-        output HDMI-A-0
-        output HDMI-A-0~1
-        output DisplayPort-0
-        output DisplayPort-1
-        # output DisplayPort-2
 
 
         # Keep it hidden until $mod is held
         mode hide
-        hidden_state hide
+        # hidden_state hide
 
         # Colours of the bar itself and i3 workspaces module
         colors {
@@ -434,7 +480,7 @@
         }
 
         # Font
-        font pango:NotoSans Nerd Font 9
+        font pango:NotoSans Nerd Font 8
         # Show only workspace name after ":", if used
         strip_workspace_numbers yes
         # Space used near screen edges
