@@ -18,7 +18,7 @@ FHD_2='640/600x1080/250+1920+0'
 FHD_HALF_1='1280/600x1080/250+0+0'
 FHD_HALF_2='1280/600x1080/250+1280+0'
 
-NAME=$(xrandr --listactivemonitors | grep "0" | cut -d '*' -f 2 | cut -d ' ' -f 1)
+NAME=$(xrandr --listactivemonitors | grep "0" | cut -d '+' -f 2 | cut -d ' ' -f 1)
 
 if [ $1 = "QHD" ]; then
     RES=$WQHD

@@ -21,7 +21,7 @@
 # Exec on startup {{{
 
     # Window compositor
-    exec --no-startup-id picom -b --config ~/.config/picom/picom.conf
+    # exec --no-startup-id picom -b --config ~/.config/picom/picom.conf
     # Set wallpaper
     exec --no-startup-id $set_wallpaper
     # Execute script of mine that handles USB Card Module 
@@ -257,16 +257,16 @@
         workspace_auto_back_and_forth yes
 
         # Workspace Monitor Config
-        workspace $ws1 output DisplayPort-0~1
-        workspace $ws2 output DisplayPort-0~1
-        workspace $ws3 output DisplayPort-0~3 DisplayPort-0~1
-        workspace $ws4 output DisplayPort-0~3 DisplayPort-0~1
-        workspace $ws5 output DisplayPort-0~2 DisplayPort-0~3 DisplayPort-0~1
-        workspace $ws6 output DisplayPort-0~2
-        workspace $ws7 output DisplayPort-0~2
-        workspace $ws8 output DisplayPort-0~2
-        workspace $ws9 output DisplayPort-0~2
-        workspace $ws10 output DisplayPort-0~2
+        workspace $ws1 output DisplayPort-0~1 HDMI-A-0
+        workspace $ws2 output DisplayPort-0~1 HDMI-A-0
+        workspace $ws3 output DisplayPort-0~3 DisplayPort-0~1 HDMI-A-0
+        workspace $ws4 output DisplayPort-0~3 DisplayPort-0~1 HDMI-A-0
+        workspace $ws5 output DisplayPort-0~2 DisplayPort-0~3 DisplayPort-0~1 HDMI-A-0
+        workspace $ws6 output DisplayPort-0~2 HDMI-A-0
+        workspace $ws7 output DisplayPort-0~2 HDMI-A-0
+        workspace $ws8 output DisplayPort-0~2 HDMI-A-0
+        workspace $ws9 output DisplayPort-0~2 HDMI-A-0
+        workspace $ws10 output DisplayPort-0~2 HDMI-A-0
     # }}}
 
     # Move focused container {{{
@@ -292,6 +292,8 @@
 
     # Small border for all windows
     for_window [class="^.*"] border pixel 2
+    # for_window [instance="Godot_Engine"] floating enable
+    # for_window [instance="Godot_Editor"] floating enable
     
     # Font for text border
     font pango:Hack Nerd Font 10
@@ -314,7 +316,7 @@
 # Program-specifc configs {{{
 
     # mGBA config
-    for_window[class="^mGBA$"] floating enable, move position center;
+    # for_window[class="^mGBA$"] floating enable, move position center;
 
     # Pavucontrol
     assign [class="Pavucontrol"] $ws10
@@ -415,7 +417,7 @@
         position top
         output DisplayPort-0
         output DisplayPort-0~1
-        # output HDMI-A-0
+        output HDMI-A-0
         # output HDMI-A-0~1
         # output DisplayPort-0
         # output DisplayPort-1
