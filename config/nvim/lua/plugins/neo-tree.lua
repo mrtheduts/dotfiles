@@ -8,6 +8,6 @@ return { -- https://github.com/nvim-neo-tree/neo-tree.nvim
     "3rd/image.nvim", -- Optional image support in preview window: See `# Preview Mode` for more information
   },
   keys = {
-    { "<leader>n", "<cmd>Neotree<CR>" },
+    { "<leader>n", "<cmd>Neotree toggle<CR>" },
   }
 }
