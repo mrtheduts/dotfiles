@@ -113,6 +113,30 @@ require("lazy").setup({
     end,
   },
 
+  -- Yazi - Explorador de arquivos
+  {
+    "mikavilpas/yazi.nvim",
+    event = "VeryLazy",
+    keys = {
+      {
+        "<leader>e",
+        "<cmd>Yazi<cr>",
+        desc = "Open yazi file explorer",
+      },
+      {
+        "<leader>cw",
+        "<cmd>Yazi cwd<cr>",
+        desc = "Open yazi in current working directory",
+      },
+    },
+    opts = {
+      open_for_directories = false,
+      keymaps = {
+        show_help = "<f1>",
+      },
+    },
+  },
+
   -- Undotree - Visualizador de undo persistente
   {
     "mbbill/undotree",
